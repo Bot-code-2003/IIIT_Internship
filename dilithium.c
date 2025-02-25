@@ -273,16 +273,16 @@ void keyGeneration(unsigned char seed[],uint16_t pk[],uint16_t sk[])
 		RejBoundPoly(rho_dash1,s1[r].arr);                             //KeyGeneration Algorithm line no. 4
 	}
 
-	// printf("\nThe values of s1 :\n");
-	// for(int r=0;r<l;r++)
-	// {
-	// 	for(int var=0;var<256;var++)
-	// 	    {
-	// 		    printf("%d ",s1[r].arr[var]);
-	// 	    }
-	// 		printf("\n\n");
-	// }
-	// printf("\n");
+	printf("\nThe values of s1 (Modified changed) :\n");
+	for(int r=0;r<l;r++)
+	{
+		for(int var=0;var<256;var++)
+		    {
+			    printf("%d ",s1[r].arr[var]);
+		    }
+			printf("\n\n");
+	}
+	printf("\n");
 
     for(uint16_t r=0;r<k;r++)
 	{
@@ -664,17 +664,17 @@ void signature(uint16_t sk[],uint16_t message[],uint16_t sign[])
         ExpandMask(rho_dash,counter_k,y);       //Signature Algorithm line no. 11
        
 
-        printf("\ny =\n");
-        for (int i = 0; i < l; i++)
-        {
-            printf("\n");
-            for (int j = 0; j < 256; j++)
-            {
-                printf("%d ",y[i].arr[j]);
-            }
-            printf("\n");
-        }
-    		printf("\n");
+        // printf("\ny =\n");
+        // for (int i = 0; i < l; i++)
+        // {
+        //     printf("\n");
+        //     for (int j = 0; j < 256; j++)
+        //     {
+        //         printf("%d ",y[i].arr[j]);
+        //     }
+        //     printf("\n");
+        // }
+    	// 	printf("\n");
 
         
 
@@ -1918,13 +1918,13 @@ void shake_128(unsigned char rho[],unsigned char md_value[],unsigned int md_len,
 		EVP_DigestFinalXOF(mdctx, md_value, md_len);
      	EVP_MD_CTX_free(mdctx);
 
-         printf("Md Len = %d ", md_len);
-     	printf("\nDigest is For shake 128 :\n");
-     	for (int i = 0; i < md_len; i++)
-     	{
-         	printf("%d ,", md_value[i]);
-        }
-     	printf("\n");
+        //  printf("Md Len = %d ", md_len);
+     	// printf("\nDigest is For shake 128 :\n");
+     	// for (int i = 0; i < md_len; i++)
+     	// {
+        //  	printf("%d ,", md_value[i]);
+        // }
+     	// printf("\n");
      	
      	/*printf("\nDigest is :");
      	for (int i = 0; i < 684; i++)
@@ -2036,6 +2036,8 @@ void RejNTTPoly(unsigned char rho[],int s,int r,int out[])
 		}
 	}
 
+    
+
 }
 
 
@@ -2060,43 +2062,82 @@ int coeff_from_half_bytes(int b)
 	}
 }
 
-void RejBoundPoly(unsigned char rho_dash[],int out[])
-{
-	size_t size=66;
+// void RejBoundPoly(unsigned char rho_dash[],int out[])
+// {
+// 	size_t size=66;
 
-	int j=0,c=0;
-	unsigned char shake256_out[512];
-	shake_256(rho_dash,shake256_out,512,size);
-	int z,z0,z1; 
+// 	int j=0,c=0;
+// 	unsigned char shake256_out[512];
+// 	shake_256(rho_dash,shake256_out,512,size);
+// 	int z,z0,z1; 
 
-	/*printf("\nShake out inside RejboundPoly :\n");
-	for (int i = 0; i < 512; i++)
-	{
-		printf("%d ",shake256_out[i]);
-	}
-	printf("\n\n");*/
+// 	/*printf("\nShake out inside RejboundPoly :\n");
+// 	for (int i = 0; i < 512; i++)
+// 	{
+// 		printf("%d ",shake256_out[i]);
+// 	}
+// 	printf("\n\n");*/
 	
 
-	while(j<256)
-	{
-		z=shake256_out[c];
-		z0=coeff_from_half_bytes(z%16);
-		z1=coeff_from_half_bytes(floor(z/16));
+// 	while(j<256)
+// 	{
+// 		z=shake256_out[c];
+// 		z0=coeff_from_half_bytes(z%16);
+// 		z1=coeff_from_half_bytes(floor(z/16));
 
-		if(z0 != -9)
-		{
-			out[j]=z0;
-			j++;
-		}
-		if(z1 != -9 && j<256)
-		{
-			out[j]=z1;
-			j++;
-		}
-		c++;
-	}
+// 		if(z0 != -9)
+// 		{
+// 			out[j]=z0;
+// 			j++;
+// 		}
+// 		if(z1 != -9 && j<256)
+// 		{
+// 			out[j]=z1;
+// 			j++;
+// 		}
+// 		c++;
+// 	}
+//     printf("\n\nC value in RejBoundPoly = %d\n",c);
+// }
+
+void RejBoundPoly(unsigned char rho_dash[], int out[]) {
+    size_t size = 66;  
+    unsigned char shake256_out[512];  
+
+    shake_256(rho_dash, shake256_out, 512, size);
+
+    int j = 0, c = 0;
+    
+    while (j < 256 && c < 512) {  
+        unsigned char z = shake256_out[c]; 
+        
+        unsigned char first_4_bits = z & 0x0F; 
+        unsigned char last_4_bits = (z >> 4) & 0x0F;  
+
+        signed char high_bits = (first_4_bits >> 2) & 0x03;  
+        signed char low_bits = first_4_bits & 0x03; 
+
+        int coeff1 = (high_bits - low_bits);  
+
+        high_bits = (last_4_bits >> 2) & 0x03; 
+        low_bits = last_4_bits & 0x03; 
+
+        int coeff2 = (high_bits - low_bits);
+
+        if (coeff1 >= -2 && coeff1 <= 2 && j < 256) {
+            out[j] = coeff1;
+            j++;
+        }
+        if (coeff2 >= -2 && coeff2 <= 2 && j < 256) {
+            out[j] = coeff2;
+            j++;
+        }
+
+        c++;
+    }
+
+    printf("\nC value in RejBoundPoly = %d\n", c);
 }
-
 
 void power2Round(int t[],int t0[],int t1[],int d)
 {
