@@ -47,7 +47,9 @@ int coeff_from_three_bytes(unsigned char b0, unsigned char b1, unsigned char b2)
 
 int coeff_from_half_bytes(int b);
 
-void RejNTTPoly(unsigned char rho[],int j,int i,int out[]);
+// void RejNTTPoly(unsigned char rho[],int j,int i,int out[]);
+void RejNTTPoly(unsigned char rho[], uint8_t j, uint8_t i, int out[]);
+
 void RejBoundPoly(unsigned char rho_dash[],int out[]);
 
 void power2Round(int t[],int t0[],int t1[],int d);
@@ -230,9 +232,9 @@ void keyGeneration(unsigned char seed[],uint16_t pk[],uint16_t sk[])
     //Expand A
 	crystal_poly a[k][l];
 		
-	for(int i=0;i<k;i++)
+	for(uint8_t i=0;i<k;i++)
 	{
-		for(int j=0;j<l;j++)
+		for(uint8_t j=0;j<l;j++)
 		{
 			RejNTTPoly(rho1,j,i,a[i][j].arr);                            //KeyGeneration Algorithm line no. 3
 		}
@@ -549,9 +551,9 @@ void signature(uint16_t sk[],uint16_t message[],uint16_t sign[])
     
 	crystal_poly a[k][l];
 		
-	for(int i=0;i<k;i++)
+	for(uint8_t i=0;i<k;i++)
 	{
-		for(int j=0;j<l;j++)
+		for(uint8_t j=0;j<l;j++)
 		{
 			RejNTTPoly(rho1,j,i,a[i][j].arr);           //Signature Algorithm line no. 5
 		}
@@ -1296,9 +1298,9 @@ bool verification(uint16_t pk[],uint16_t message[],uint16_t sign[]){
             rho1[i]=rho[i];
         }
 
-	    for(int i=0;i<k;i++)
+	    for(uint8_t i=0;i<k;i++)
 	    {
-		    for(int j=0;j<l;j++)
+		    for(uint8_t j=0;j<l;j++)
 		    {
 			    RejNTTPoly(rho1,j,i,a[i][j].arr);                           //Verification Algorithm line no. 5
 		    }
@@ -2011,7 +2013,7 @@ int coeff_from_three_bytes(unsigned char b0, unsigned char b1, unsigned char b2)
     }
 }
 
-void RejNTTPoly(unsigned char rho[],int s,int r,int out[])
+void RejNTTPoly(unsigned char rho[],uint8_t s,uint8_t r,int out[])
 {
 	/*int j_[8],i_[8];
 	int_to_bits(j,j_);
@@ -2035,9 +2037,6 @@ void RejNTTPoly(unsigned char rho[],int s,int r,int out[])
 			j++;
 		}
 	}
-
-    
-
 }
 
 
